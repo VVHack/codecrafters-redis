@@ -1,0 +1,9 @@
+{
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/Users/vedant_gupta/projects/codecrafters-redis-cpp/build",
+            "binaryPath": "/Users/vedant_gupta/projects/codecrafters-redis-cpp/build/redis",
+            "binaryArgs": []
+        }
+    ]
+}
