@@ -483,6 +483,7 @@ int main(int argc, char **argv) {
 							} else {
 								// Initialize the array first, otherwise the map contains garbage.
 								streams[stream_key][millis][seq] = std::make_shared<RespArray>();
+								std::cout << "Created RespArray for " << stream_key << ": " << streams[stream_key][millis][seq].get() << std::endl;
 								auto& elts = streams[stream_key][millis][seq]->elts;
 								for (int i = 3; i < arr->elts.size(); i += 2) {
 									auto pr = std::make_shared<RespArray>(std::vector<std::shared_ptr<RespElement>>{
@@ -592,7 +593,8 @@ int main(int argc, char **argv) {
 								} else {
 									std::cout << "GETS HERE 3" << std::endl;
 									while (kt != jt->second.end()) {
-										std::cout << "Pushing one element " << dynamic_cast<BulkString*>(kt->second->elts[0].get())->str << std::endl;
+										//std::cout << "Pushing one element " << dynamic_cast<BulkString*>(kt->second->elts[0].get())->str << std::endl;
+										std::cout << "Pushing one element from array " << kt->second.get() << std::endl;
 										result.elts.push_back(kt->second);
 										++kt;
 									}
