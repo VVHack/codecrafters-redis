@@ -525,6 +525,13 @@ int main(int argc, char **argv) {
 							} else {
 								stream_last_entry[stream_key] = {millis, seq};
 								streams[stream_key][millis][seq] = std::make_shared<RespArray>();
+								auto& elts = streams[stream_key][millis][seq]->elts;
+								for (int i = 3; i < arr->elts.size(); i += 2) {
+									auto pr = std::make_shared<RespArray>(std::vector<std::shared_ptr<RespElement>>{
+											arr->elts[i], arr->elts[i + 1]});
+									std::cout << "Address of array for " << arr->elts[i] << ", " << arr->elts[i + 1] << ": " << pr.get() << std::endl;
+									elts.push_back(pr);
+								}
 								pthread_mutex_unlock(&stream_mtx);
 								int num_bytes =
 								BulkString(std::format("{}-{}", std::to_string(millis), std::to_string(seq))).encode(response, 1024);
