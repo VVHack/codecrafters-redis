@@ -608,9 +608,12 @@ int main(int argc, char **argv) {
 										while (kt != jt->second.end()) {
 											//std::cout << "Pushing one element " << dynamic_cast<BulkString*>(kt->second->elts[0].get())->str << std::endl;
 											std::cout << "Pushing one element from array " << kt->second.get() << std::endl;
-											for (auto elt : kt->second->elts) {
+											for (auto key_val : kt->second->elts) {
 												//std::cout << dynamic_cast<BulkString*>(elt.get())->str << std::endl;
-												cur->elts.push_back(elt);
+												auto key = dynamic_cast<RespArray*>(key_val.get())->elts[0];
+												auto val = dynamic_cast<RespArray*>(key_val.get())->elts[1];
+												cur->elts.push_back(key);
+												cur->elts.push_back(val);
 											}
 											++kt;
 											if (jt->first == millis_2 && kt->first == seq_2) {
