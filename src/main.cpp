@@ -604,11 +604,11 @@ int main(int argc, char **argv) {
 										}
 									} else {
 										std::cout << "GETS HERE 3 " << kt->first << std::endl;
-										auto k_v_pairs = std::make_shared<RespArray>();
-										auto cur = std::make_shared<RespArray>(std::vector<std::shared_ptr<RespElement>>{
-												std::make_shared<BulkString>(std::format("{}-{}", std::to_string(jt->first),
-															std::to_string(kt->first))), k_v_pairs});
 										while (kt != jt->second.end()) {
+											auto k_v_pairs = std::make_shared<RespArray>();
+											auto cur = std::make_shared<RespArray>(std::vector<std::shared_ptr<RespElement>>{
+													std::make_shared<BulkString>(std::format("{}-{}", std::to_string(jt->first),
+																std::to_string(kt->first))), k_v_pairs});
 											//std::cout << "Pushing one element " << dynamic_cast<BulkString*>(kt->second->elts[0].get())->str << std::endl;
 											std::cout << "Pushing one element from array " << kt->second.get() << std::endl;
 											for (auto key_val : kt->second->elts) {
@@ -618,12 +618,12 @@ int main(int argc, char **argv) {
 												k_v_pairs->elts.push_back(key);
 												k_v_pairs->elts.push_back(val);
 											}
+											result.elts.push_back(cur);
 											if (jt->first == millis_2 && kt->first == seq_2) {
 												break;
 											}
 											++kt;
 										}
-										result.elts.push_back(cur);
 									}
 									if (jt->first == millis_2) {
 										break;
