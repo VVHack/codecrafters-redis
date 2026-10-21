@@ -592,7 +592,7 @@ int main(int argc, char **argv) {
 								} else {
 									std::cout << "GETS HERE 3" << std::endl;
 									while (kt != jt->second.end()) {
-										std::cout << "Pushing one element" << std::endl;
+										std::cout << "Pushing one element " << dynamic_cast<BulkString*>(kt->second->elts[0].get())->str << std::endl;
 										result.elts.push_back(kt->second);
 										++kt;
 									}
