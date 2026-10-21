@@ -589,23 +589,40 @@ int main(int argc, char **argv) {
 								}
 							} else {
 								std::cout << "GETS HERE 2" << std::endl;
-								auto kt = jt->second.find(seq_1);
-								if (kt == jt->second.end()) {
-									int num_bytes = SimpleError("ERR Invalid starting seq number")
-										.encode(response, 1024);
-									if (num_bytes == -1) {
-										send(client.client_list[i], "Internal error", strlen("Internal error"), 0);
+								while (jt != it->second.end()) {
+									auto cur = std::make_shared<RespArray>();
+									auto kt = jt->second.begin();
+									if (jt->first == millis_1) {
+										kt = jt->second.find(seq_1);
+									}
+									if (kt == jt->second.end()) {
+										int num_bytes = SimpleError("ERR Invalid starting seq number or no entries found")
+											.encode(response, 1024);
+										if (num_bytes == -1) {
+											send(client.client_list[i], "Internal error", strlen("Internal error"), 0);
+										} else {
+											send(client.client_list[i], response, num_bytes, 0);
+										}
 									} else {
-										send(client.client_list[i], response, num_bytes, 0);
+										std::cout << "GETS HERE 3" << std::endl;
+										while (kt != jt->second.end()) {
+											//std::cout << "Pushing one element " << dynamic_cast<BulkString*>(kt->second->elts[0].get())->str << std::endl;
+											std::cout << "Pushing one element from array " << kt->second.get() << std::endl;
+											cur->elts.push_back(kt->second);
+											++kt;
+											if (jt->first == millis_2 && kt->first == seq_2) {
+												break;
+											}
+										}
 									}
-								} else {
-									std::cout << "GETS HERE 3" << std::endl;
-									while (kt != jt->second.end()) {
-										//std::cout << "Pushing one element " << dynamic_cast<BulkString*>(kt->second->elts[0].get())->str << std::endl;
-										std::cout << "Pushing one element from array " << kt->second.get() << std::endl;
-										result.elts.push_back(kt->second);
-										++kt;
+									auto pr = std::make_shared<RespArray>(std::vector<std::shared_ptr<RespElement>>{
+											std::make_shared<BulkString>(std::format("{}-{}", std::to_string(jt->first),
+														std::to_string(kt->first))), cur});
+									result.elts.push_back(pr);
+									if (jt->first == millis_2) {
+										break;
 									}
+									++jt;
 								}
 							}
 						}
