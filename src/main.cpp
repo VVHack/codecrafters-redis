@@ -590,7 +590,6 @@ int main(int argc, char **argv) {
 							} else {
 								while (jt != it->second.end()) {
 									std::cout << "GETS HERE 2 " << jt->first << std::endl;
-									auto cur = std::make_shared<RespArray>();
 									auto kt = jt->second.begin();
 									if (jt->first == millis_1) {
 										kt = jt->second.find(seq_1);
@@ -605,6 +604,10 @@ int main(int argc, char **argv) {
 										}
 									} else {
 										std::cout << "GETS HERE 3 " << kt->first << std::endl;
+										auto k_v_pairs = std::make_shared<RespArray>();
+										auto cur = std::make_shared<RespArray>(std::vector<std::shared_ptr<RespElement>>{
+												std::make_shared<BulkString>(std::format("{}-{}", std::to_string(jt->first),
+															std::to_string(kt->first))), k_v_pairs});
 										while (kt != jt->second.end()) {
 											//std::cout << "Pushing one element " << dynamic_cast<BulkString*>(kt->second->elts[0].get())->str << std::endl;
 											std::cout << "Pushing one element from array " << kt->second.get() << std::endl;
@@ -612,19 +615,16 @@ int main(int argc, char **argv) {
 												//std::cout << dynamic_cast<BulkString*>(elt.get())->str << std::endl;
 												auto key = dynamic_cast<RespArray*>(key_val.get())->elts[0];
 												auto val = dynamic_cast<RespArray*>(key_val.get())->elts[1];
-												cur->elts.push_back(key);
-												cur->elts.push_back(val);
+												k_v_pairs->elts.push_back(key);
+												k_v_pairs->elts.push_back(val);
 											}
 											++kt;
 											if (jt->first == millis_2 && kt->first == seq_2) {
 												break;
 											}
 										}
+										result.elts.push_back(cur);
 									}
-									auto pr = std::make_shared<RespArray>(std::vector<std::shared_ptr<RespElement>>{
-											std::make_shared<BulkString>(std::format("{}-{}", std::to_string(jt->first),
-														std::to_string(kt->first))), cur});
-									result.elts.push_back(pr);
 									if (jt->first == millis_2) {
 										break;
 									}
