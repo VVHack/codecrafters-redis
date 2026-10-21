@@ -488,6 +488,7 @@ int main(int argc, char **argv) {
 								for (int i = 3; i < arr->elts.size(); i += 2) {
 									auto pr = std::make_shared<RespArray>(std::vector<std::shared_ptr<RespElement>>{
 											arr->elts[i], arr->elts[i + 1]});
+									std::cout << "Address of array for " << arr->elts[i] << ", " << arr->elts[i + 1] << ": " << pr.get() << std::endl;
 									elts.push_back(pr);
 								}
 								stream_last_entry[stream_key] = {millis, seq};
