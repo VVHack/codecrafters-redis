@@ -609,6 +609,7 @@ int main(int argc, char **argv) {
 											//std::cout << "Pushing one element " << dynamic_cast<BulkString*>(kt->second->elts[0].get())->str << std::endl;
 											std::cout << "Pushing one element from array " << kt->second.get() << std::endl;
 											for (auto elt : kt->second->elts) {
+												std::cout << dynamic_cast<BulkString*>(elt.get())->str << std::endl;
 												cur->elts.push_back(elt);
 											}
 											++kt;
