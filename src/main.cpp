@@ -618,10 +618,10 @@ int main(int argc, char **argv) {
 												k_v_pairs->elts.push_back(key);
 												k_v_pairs->elts.push_back(val);
 											}
-											++kt;
 											if (jt->first == millis_2 && kt->first == seq_2) {
 												break;
 											}
+											++kt;
 										}
 										result.elts.push_back(cur);
 									}
