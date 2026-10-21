@@ -314,9 +314,9 @@ int main(int argc, char **argv) {
 						auto it = lists.find(list_key);
 						if (it != lists.end() && !it->second.empty()) {
 							if (to_remove == 1) {
-								pthread_mutex_unlock(&list_mtx);
 								auto elt = it->second.front();
 								it->second.pop_front();
+								pthread_mutex_unlock(&list_mtx);
 								int num_bytes = elt->encode(response, 1024);
 								send(client.client_list[i], response, num_bytes, 0);
 							} else {
