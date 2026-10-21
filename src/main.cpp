@@ -568,6 +568,7 @@ int main(int argc, char **argv) {
 								send(client.client_list[i], response, num_bytes, 0);
 							}
 						} else {
+							std::cout << "GETS HERE 1" << std::endl;
 							auto jt = it->second.find(millis_1);
 							if (jt == it->second.end()) {
 								int num_bytes = SimpleError("ERR Invalid starting entry id")
@@ -578,6 +579,7 @@ int main(int argc, char **argv) {
 									send(client.client_list[i], response, num_bytes, 0);
 								}
 							} else {
+								std::cout << "GETS HERE 2" << std::endl;
 								auto kt = jt->second.find(seq_1);
 								if (kt == jt->second.end()) {
 									int num_bytes = SimpleError("ERR Invalid starting seq number")
@@ -588,6 +590,7 @@ int main(int argc, char **argv) {
 										send(client.client_list[i], response, num_bytes, 0);
 									}
 								} else {
+									std::cout << "GETS HERE 3" << std::endl;
 									while (kt != jt->second.end()) {
 										result.elts.push_back(kt->second);
 										++kt;
