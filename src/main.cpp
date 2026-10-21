@@ -483,12 +483,10 @@ int main(int argc, char **argv) {
 							} else {
 								// Initialize the array first, otherwise the map contains garbage.
 								streams[stream_key][millis][seq] = std::make_shared<RespArray>();
-								std::cout << "Created RespArray for " << stream_key << ": " << streams[stream_key][millis][seq].get() << std::endl;
 								auto& elts = streams[stream_key][millis][seq]->elts;
 								for (int i = 3; i < arr->elts.size(); i += 2) {
 									auto pr = std::make_shared<RespArray>(std::vector<std::shared_ptr<RespElement>>{
 											arr->elts[i], arr->elts[i + 1]});
-									std::cout << "Address of array for " << arr->elts[i] << ", " << arr->elts[i + 1] << ": " << pr.get() << std::endl;
 									elts.push_back(pr);
 								}
 								stream_last_entry[stream_key] = {millis, seq};
@@ -529,7 +527,6 @@ int main(int argc, char **argv) {
 								for (int i = 3; i < arr->elts.size(); i += 2) {
 									auto pr = std::make_shared<RespArray>(std::vector<std::shared_ptr<RespElement>>{
 											arr->elts[i], arr->elts[i + 1]});
-									std::cout << "Address of array for " << arr->elts[i] << ", " << arr->elts[i + 1] << ": " << pr.get() << std::endl;
 									elts.push_back(pr);
 								}
 								pthread_mutex_unlock(&stream_mtx);
@@ -563,8 +560,6 @@ int main(int argc, char **argv) {
 						if (seq_1 == -1) seq_1 = 0;
 						auto [millis_2, seq_2] = parse_entry_id(entry_id_2);
 						RespArray result;
-						std::cout << "millis_1 = " << millis_1 << ", seq_1 = " << seq_1 << std::endl;
-						std::cout << "millis_2 = " << millis_2 << ", seq_2 = " << seq_2 << std::endl;
 
 						pthread_mutex_lock(&stream_mtx);
 						auto it = streams.find(stream_key);
@@ -577,7 +572,6 @@ int main(int argc, char **argv) {
 								send(client.client_list[i], response, num_bytes, 0);
 							}
 						} else {
-							std::cout << "GETS HERE 1 " << it->first << std::endl;
 							auto jt = it->second.find(millis_1);
 							if (jt == it->second.end()) {
 								int num_bytes = SimpleError("ERR Invalid starting entry id")
@@ -589,7 +583,6 @@ int main(int argc, char **argv) {
 								}
 							} else {
 								while (jt != it->second.end()) {
-									std::cout << "GETS HERE 2 " << jt->first << std::endl;
 									auto kt = jt->second.begin();
 									if (jt->first == millis_1) {
 										kt = jt->second.find(seq_1);
@@ -603,16 +596,12 @@ int main(int argc, char **argv) {
 											send(client.client_list[i], response, num_bytes, 0);
 										}
 									} else {
-										std::cout << "GETS HERE 3 " << kt->first << std::endl;
 										while (kt != jt->second.end()) {
 											auto k_v_pairs = std::make_shared<RespArray>();
 											auto cur = std::make_shared<RespArray>(std::vector<std::shared_ptr<RespElement>>{
 													std::make_shared<BulkString>(std::format("{}-{}", std::to_string(jt->first),
 																std::to_string(kt->first))), k_v_pairs});
-											//std::cout << "Pushing one element " << dynamic_cast<BulkString*>(kt->second->elts[0].get())->str << std::endl;
-											std::cout << "Pushing one element from array " << kt->second.get() << std::endl;
 											for (auto key_val : kt->second->elts) {
-												//std::cout << dynamic_cast<BulkString*>(elt.get())->str << std::endl;
 												auto key = dynamic_cast<RespArray*>(key_val.get())->elts[0];
 												auto val = dynamic_cast<RespArray*>(key_val.get())->elts[1];
 												k_v_pairs->elts.push_back(key);
