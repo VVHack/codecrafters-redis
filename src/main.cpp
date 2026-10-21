@@ -608,7 +608,9 @@ int main(int argc, char **argv) {
 										while (kt != jt->second.end()) {
 											//std::cout << "Pushing one element " << dynamic_cast<BulkString*>(kt->second->elts[0].get())->str << std::endl;
 											std::cout << "Pushing one element from array " << kt->second.get() << std::endl;
-											cur->elts.push_back(kt->second);
+											for (auto elt : kt->second->elts) {
+												cur->elts.push_back(elt);
+											}
 											++kt;
 											if (jt->first == millis_2 && kt->first == seq_2) {
 												break;
