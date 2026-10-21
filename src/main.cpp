@@ -577,7 +577,7 @@ int main(int argc, char **argv) {
 								send(client.client_list[i], response, num_bytes, 0);
 							}
 						} else {
-							std::cout << "GETS HERE 1" << std::endl;
+							std::cout << "GETS HERE 1 " << it->first << std::endl;
 							auto jt = it->second.find(millis_1);
 							if (jt == it->second.end()) {
 								int num_bytes = SimpleError("ERR Invalid starting entry id")
@@ -588,8 +588,8 @@ int main(int argc, char **argv) {
 									send(client.client_list[i], response, num_bytes, 0);
 								}
 							} else {
-								std::cout << "GETS HERE 2" << std::endl;
 								while (jt != it->second.end()) {
+									std::cout << "GETS HERE 2 " << jt->first << std::endl;
 									auto cur = std::make_shared<RespArray>();
 									auto kt = jt->second.begin();
 									if (jt->first == millis_1) {
@@ -604,12 +604,12 @@ int main(int argc, char **argv) {
 											send(client.client_list[i], response, num_bytes, 0);
 										}
 									} else {
-										std::cout << "GETS HERE 3" << std::endl;
+										std::cout << "GETS HERE 3 " << kt->first << std::endl;
 										while (kt != jt->second.end()) {
 											//std::cout << "Pushing one element " << dynamic_cast<BulkString*>(kt->second->elts[0].get())->str << std::endl;
 											std::cout << "Pushing one element from array " << kt->second.get() << std::endl;
 											for (auto elt : kt->second->elts) {
-												std::cout << dynamic_cast<BulkString*>(elt.get())->str << std::endl;
+												//std::cout << dynamic_cast<BulkString*>(elt.get())->str << std::endl;
 												cur->elts.push_back(elt);
 											}
 											++kt;
