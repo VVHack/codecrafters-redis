@@ -14,7 +14,8 @@
 #include "lrange.h"
 #include "resp.h"
 
-// Parses a single client request off the wire and classifies it as a Command.
+// Parses a single client request off the wire and instantiates the appropriate
+// Command subclass.
 //
 // The raw bytes are first decoded into a RESP tree by Parse(). Two shapes are
 // accepted:
@@ -23,22 +24,21 @@
 //     elements are the arguments (the normal form real clients send).
 //
 // Each branch validates both the arity and the element types it needs before
-// claiming the command, so downstream handlers can index into the array and
-// dynamic_cast to BulkString without re-checking. Arity rules mirror Redis:
-// exact counts for fixed commands (GET, LLEN, TYPE, LRANGE, BLPOP, XRANGE),
-// minimums for variadic ones (SET with its options, RPUSH/LPUSH with multiple
-// values, LPOP with an optional count), and XADD additionally requires an odd
-// total size so the trailing field/value pairs are balanced.
+// claiming the command, so concrete Command implementations can index into
+// the array and dynamic_cast to BulkString without re-checking. Arity rules
+// mirror Redis: exact counts for fixed commands (GET, LLEN, TYPE, LRANGE,
+// BLPOP, XRANGE), minimums for variadic ones (SET with its options, RPUSH/LPUSH
+// with multiple values, LPOP with an optional count), and XADD additionally
+// requires an odd total size so the trailing field/value pairs are balanced.
 //
 // Anything that fails validation — an unknown name, wrong arity, or a
-// non-bulk-string where one is required — falls through to Command::UNKNOWN
-// rather than throwing. Note this is deliberately silent: a malformed SET is
-// reported the same way as a command we simply do not implement.
+// non-bulk-string where one is required — returns nullptr rather than throwing.
+// Note this is deliberately silent: a malformed SET is handled the same way as
+// a command we simply do not implement.
 //
-// Returns the classification paired with ownership of the parsed RESP tree, so
-// the caller can read the arguments out of it. The tree is returned even for
-// UNKNOWN. Command name matching is case-sensitive (uppercase only), unlike
-// real Redis.
+// Returns a std::unique_ptr<Command> holding ownership of the parsed RESP
+// tree, or nullptr on failure. Command name matching is case-sensitive
+// (uppercase only), unlike real Redis.
 //
 // req/len are the request bytes; the parse starts at offset 0 and any bytes
 // after the first complete RESP element are ignored.
