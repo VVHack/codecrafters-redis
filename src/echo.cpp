@@ -4,6 +4,7 @@
 #include "resp.h"
 
 std::shared_ptr<RespElement> Echo::run(State& state, int client_fd) {
-	return cmd_info_;
+	auto arr = dynamic_cast<RespArray*>(cmd_info_.get());
+	return arr->elts[1];
 }
 
