@@ -115,9 +115,8 @@ std::unique_ptr<Command> ParseCommand(const char* req, int len) {
 				dynamic_cast<BulkString*>(arr->elts[0].get())->str == "XRANGE") {
 			return std::make_unique<Xrange>(std::shared_ptr<RespElement>(resp.release()));
 		}
-
-
 	}
+	return nullptr;
 	//return {Command::UNKNOWN, std::move(resp)};
 }
 

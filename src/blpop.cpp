@@ -93,5 +93,6 @@ std::shared_ptr<RespElement> Blpop::run(State& state, int client_fd) {
 				new ListPopTimeoutDetails(client_fd, list_key, (long long)(1000 * expiry), &state));
 		pthread_detach(timeout_thread);
 	}
+	return nullptr;
 }
 

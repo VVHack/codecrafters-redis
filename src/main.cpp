@@ -101,6 +101,9 @@ int main(int argc, char **argv) {
 				valread = recv(client.client_list[i], buffer, 1024 - 1, 0);
 				if (valread == -1 || valread == 0) break;
 				auto cmd = ParseCommand(buffer, 1024);
+				if (cmd == nullptr) {
+					send(client.client_list[i], "Internal error", strlen("Internal error"), 0);
+				}
 				auto result = cmd->run(state, client.client_list[i]);
 				if (result != nullptr) {
 					char response[1024] = {0};
