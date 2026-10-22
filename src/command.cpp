@@ -1,4 +1,17 @@
 #include "command.h"
+#include "echo.h"
+#include "ping.h"
+#include "set.h"
+#include "lpop.h"
+#include "blpop.h"
+#include "lpush.h"
+#include "xadd.h"
+#include "xrange.h"
+#include "llen.h"
+#include "type.h"
+#include "get.h"
+#include "rpush.h"
+#include "lrange.h"
 #include "resp.h"
 
 // Parses a single client request off the wire and classifies it as a Command.
@@ -29,82 +42,82 @@
 //
 // req/len are the request bytes; the parse starts at offset 0 and any bytes
 // after the first complete RESP element are ignored.
-std::pair<Command, std::unique_ptr<RespElement>> ParseCommand(const char* req, int len) {
+std::unique_ptr<Command> ParseCommand(const char* req, int len) {
 	int pos = 0;
 	std::unique_ptr<RespElement> resp = Parse(req, len, pos);
 	if (resp->type == RespType::BULK_STRING &&
 			dynamic_cast<BulkString*>(resp.get())->str == "PING") {
-		return {Command::PING, std::move(resp)};
+		return std::make_unique<Ping>(std::shared_ptr<RespElement>(resp.release()));
 	}
 	if (resp->type == RespType::ARRAY) {
 		auto arr = dynamic_cast<RespArray*>(resp.get());
 		if (arr->elts.size() == 2 && arr->elts[0]->type == RespType::BULK_STRING &&
 				dynamic_cast<BulkString*>(arr->elts[0].get())->str == "ECHO") {
 			if (arr->elts[1]->type == RespType::BULK_STRING) {
-				return {Command::ECHO, std::move(resp)};
+				return std::make_unique<Echo>(std::shared_ptr<RespElement>(resp.release()));
 			}
 		} else if (arr->elts.size() == 1 && arr->elts[0]->type == RespType::BULK_STRING &&
 				dynamic_cast<BulkString*>(arr->elts[0].get())->str == "PING") {
-			return {Command::PING, std::move(resp)};
+			return std::make_unique<Ping>(std::shared_ptr<RespElement>(resp.release()));
 		} else if (arr->elts.size() >= 3 && arr->elts[0]->type == RespType::BULK_STRING &&
 				dynamic_cast<BulkString*>(arr->elts[0].get())->str == "SET") {
 			if (arr->elts[1]->type == RespType::BULK_STRING && arr->elts[2]->type == RespType::BULK_STRING) {
-				return {Command::SET, std::move(resp)};
+				return std::make_unique<Set>(std::shared_ptr<RespElement>(resp.release()));
 			}
 		} else if (arr->elts.size() == 2 && arr->elts[0]->type == RespType::BULK_STRING &&
 				dynamic_cast<BulkString*>(arr->elts[0].get())->str == "GET") {
 			if (arr->elts[1]->type == RespType::BULK_STRING) {
-				return {Command::GET, std::move(resp)};
+				return std::make_unique<Get>(std::shared_ptr<RespElement>(resp.release()));
 			}
 		} else if (arr->elts.size() >= 3 && arr->elts[0]->type == RespType::BULK_STRING &&
 				dynamic_cast<BulkString*>(arr->elts[0].get())->str == "RPUSH") {
 			if (arr->elts[1]->type == RespType::BULK_STRING) {
-				return {Command::RPUSH, std::move(resp)};
+				return std::make_unique<Rpush>(std::shared_ptr<RespElement>(resp.release()));
 			}
 		} else if (arr->elts.size() >= 3 && arr->elts[0]->type == RespType::BULK_STRING &&
 				dynamic_cast<BulkString*>(arr->elts[0].get())->str == "LPUSH") {
 			if (arr->elts[1]->type == RespType::BULK_STRING) {
-				return {Command::LPUSH, std::move(resp)};
+				return std::make_unique<Lpush>(std::shared_ptr<RespElement>(resp.release()));
 			}
 		} else if (arr->elts.size() >= 2 && arr->elts[0]->type == RespType::BULK_STRING &&
 				dynamic_cast<BulkString*>(arr->elts[0].get())->str == "LPOP") {
 			if (arr->elts[1]->type == RespType::BULK_STRING) {
-				return {Command::LPOP, std::move(resp)};
+				return std::make_unique<Lpop>(std::shared_ptr<RespElement>(resp.release()));
 			}
 		} else if (arr->elts.size() == 3 && arr->elts[0]->type == RespType::BULK_STRING &&
 				dynamic_cast<BulkString*>(arr->elts[0].get())->str == "BLPOP") {
 			if (arr->elts[1]->type == RespType::BULK_STRING) {
-				return {Command::BLPOP, std::move(resp)};
+				return std::make_unique<Blpop>(std::shared_ptr<RespElement>(resp.release()));
 			}
 		} else if (arr->elts.size() == 4 && arr->elts[0]->type == RespType::BULK_STRING &&
 				dynamic_cast<BulkString*>(arr->elts[0].get())->str == "LRANGE") {
 			if (arr->elts[1]->type == RespType::BULK_STRING &&
 					arr->elts[2]->type == RespType::BULK_STRING && arr->elts[3]->type == RespType::BULK_STRING) {
-				return {Command::LRANGE, std::move(resp)};
+				return std::make_unique<Lrange>(std::shared_ptr<RespElement>(resp.release()));
 			}
 		} else if (arr->elts.size() == 2 && arr->elts[0]->type == RespType::BULK_STRING &&
 				dynamic_cast<BulkString*>(arr->elts[0].get())->str == "LLEN") {
 			if (arr->elts[1]->type == RespType::BULK_STRING) {
-				return {Command::LLEN, std::move(resp)};
+				return std::make_unique<Llen>(std::shared_ptr<RespElement>(resp.release()));
 			}
 		} else if (arr->elts.size() == 2 && arr->elts[0]->type == RespType::BULK_STRING &&
 				dynamic_cast<BulkString*>(arr->elts[0].get())->str == "TYPE") {
 			if (arr->elts[1]->type == RespType::BULK_STRING) {
-				return {Command::TYPE, std::move(resp)};
+				return std::make_unique<Type>(std::shared_ptr<RespElement>(resp.release()));
 			}
 		} else if (arr->elts.size() >= 3 && arr->elts[0]->type == RespType::BULK_STRING &&
 				dynamic_cast<BulkString*>(arr->elts[0].get())->str == "XADD") {
 			if (arr->elts[1]->type == RespType::BULK_STRING &&
 					arr->elts[2]->type == RespType::BULK_STRING && arr->elts.size() % 2 == 1) {
-				return {Command::XADD, std::move(resp)};
+				return std::make_unique<Xadd>(std::shared_ptr<RespElement>(resp.release()));
 			}
 		} else if (arr->elts.size() == 4 && arr->elts[0]->type == RespType::BULK_STRING &&
 				dynamic_cast<BulkString*>(arr->elts[0].get())->str == "XRANGE") {
-			return {Command::XRANGE, std::move(resp)};
+			return std::make_unique<Xrange>(std::shared_ptr<RespElement>(resp.release()));
 		}
 
 
 	}
-	return {Command::UNKNOWN, std::move(resp)};
+	//return {Command::UNKNOWN, std::move(resp)};
 }
 

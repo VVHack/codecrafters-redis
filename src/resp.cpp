@@ -14,7 +14,11 @@ std::unique_ptr<RespElement> Parse(const char* buff, int len, int& pos) {
 	if (buff[pos] == ':') {
 		elt = std::make_unique<Number>();
 	} else if (buff[pos] == '$') {
-		elt = std::make_unique<BulkString>();
+		if (pos + 1 < len && buff[pos + 1] == '-') {
+			elt = std::make_unique<NullBulkString>();
+		} else {
+			elt = std::make_unique<BulkString>();
+		}
 	} else if (buff[pos] == '+') {
 		elt = std::make_unique<SimpleString>();
 	} else if (buff[pos] == '-') {
@@ -78,6 +82,23 @@ int BulkString::encode(char* buff, int len) const {
 	if (len < (4 + std::to_string(str.size()).size() + str.size())) return -1;
 	int pos = 0;
 	std::string formatted = std::format("${}\r\n{}\r\n", (int)str.size(), str);
+	for (char c : formatted) {
+		buff[pos++] = c;
+	}
+	return formatted.size();
+}
+
+void NullBulkString::parse(const char* buff, int len, int& pos) {
+	if (pos + 5 <= len &&
+			buff[0] == '$' && buff[1] == '-' && buff[2] == '1' && buff[3] == '\r' && buff[4] == '\n') {
+		pos += 5;
+	}
+}
+
+int NullBulkString::encode(char* buff, int len) const {
+	if (len < 5) return -1;
+	int pos = 0;
+	std::string formatted = "$-1\r\n";
 	for (char c : formatted) {
 		buff[pos++] = c;
 	}

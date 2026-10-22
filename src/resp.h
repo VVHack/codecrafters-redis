@@ -10,6 +10,7 @@ enum class RespType {
 	NUMBER,
 	SIMPLE_STRING,
 	BULK_STRING,
+	NULL_BULK_STRING,
 	ARRAY,
 	SIMPLE_ERROR,
 };
@@ -39,6 +40,12 @@ struct BulkString : public RespElement {
 	int encode(char* buff, int len) const override;
 	
 	std::string str;
+};
+
+struct NullBulkString : public RespElement {
+	NullBulkString() : RespElement(RespType::NULL_BULK_STRING) {}
+	void parse(const char* buff, int len, int& pos) override;
+	int encode(char* buff, int len) const override;
 };
 
 struct SimpleString : public RespElement {

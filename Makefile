@@ -49,10 +49,11 @@ TARGET = $(BUILD_DIR)/redis
 
 # Object files
 RESP_OBJ = $(BUILD_DIR)/resp.o
-COMMAND_OBJ = $(BUILD_DIR)/command.o
 MAIN_OBJ = $(BUILD_DIR)/main.o
+COMMAND_SRCS = $(filter-out $(SRC_DIR)/main.cpp $(SRC_DIR)/resp.cpp, $(wildcard $(SRC_DIR)/*.cpp))
+COMMAND_OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(COMMAND_SRCS))
 
-OBJS = $(RESP_OBJ) $(COMMAND_OBJ) $(MAIN_OBJ)
+OBJS = $(RESP_OBJ) $(MAIN_OBJ) $(COMMAND_OBJS)
 
 # Static libraries
 RESP_LIB = $(BUILD_DIR)/libresp.a
@@ -76,9 +77,9 @@ $(RESP_LIB): $(RESP_OBJ)
 	$(AR) $(ARFLAGS) $@ $<
 
 # Static library target for Command module
-$(COMMAND_LIB): $(COMMAND_OBJ)
+$(COMMAND_LIB): $(COMMAND_OBJS)
 	@mkdir -p $(BUILD_DIR)
-	$(AR) $(ARFLAGS) $@ $<
+	$(AR) $(ARFLAGS) $@ $^
 
 # Specific object file targets with explicit header dependencies
 $(BUILD_DIR)/resp.o: $(SRC_DIR)/resp.cpp $(SRC_DIR)/resp.h
