@@ -117,6 +117,5 @@ std::unique_ptr<Command> ParseCommand(const char* req, int len) {
 		}
 	}
 	return nullptr;
-	//return {Command::UNKNOWN, std::move(resp)};
 }
 

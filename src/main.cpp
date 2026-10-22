@@ -103,16 +103,17 @@ int main(int argc, char **argv) {
 				auto cmd = ParseCommand(buffer, 1024);
 				if (cmd == nullptr) {
 					send(client.client_list[i], "Internal error", strlen("Internal error"), 0);
-				}
-				auto result = cmd->run(state, client.client_list[i]);
-				if (result != nullptr) {
-					char response[1024] = {0};
-					int num_bytes = result->encode(response, 1024);
-					if (num_bytes == -1) {
-						send(client.client_list[i], "Internal error", strlen("Internal error"), 0);
-					} else {
-						std::cout << "Sending back " << response << std::endl;
-						send(client.client_list[i], response, num_bytes, 0);
+				} else {
+					auto result = cmd->run(state, client.client_list[i]);
+					if (result != nullptr) {
+						char response[1024] = {0};
+						int num_bytes = result->encode(response, 1024);
+						if (num_bytes == -1) {
+							send(client.client_list[i], "Internal error", strlen("Internal error"), 0);
+						} else {
+							std::cout << "Sending back " << response << std::endl;
+							send(client.client_list[i], response, num_bytes, 0);
+						}
 					}
 				}
 			}
