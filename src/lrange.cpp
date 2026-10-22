@@ -24,5 +24,6 @@ std::shared_ptr<RespElement> Lrange::run(State& state, int client_fd) {
 		}
 	}
 	pthread_mutex_unlock(&state.list_mtx);
+	return lrange;
 }
 
